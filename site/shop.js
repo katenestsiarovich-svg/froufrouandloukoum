@@ -66,12 +66,31 @@ function openProduct(id) {
   document.getElementById("panel").classList.add("open");
   document.body.style.overflow = "hidden";
   document.getElementById("panel").scrollTop = 0;
+
+  // Записываем открытие в историю браузера, чтобы кнопка «Назад»
+  // закрывала карточку, а не уводила с сайта.
+  if (!history.state?.panel) {
+    history.pushState({ panel: id }, "", "#" + id);
+  }
 }
 
-function closeProduct() {
+// closeProduct вызывается из крестика и Escape — тогда нужно
+// откатить историю. Когда закрытие пришло от самой кнопки
+// «Назад», откатывать не надо, иначе уйдём на шаг лишний.
+function closeProduct(fromHistory = false) {
+  const wasOpen = document.getElementById("panel").classList.contains("open");
   document.getElementById("panel").classList.remove("open");
   document.body.style.overflow = "";
+  if (wasOpen && !fromHistory && history.state?.panel) history.back();
 }
+
+// Кнопка «Назад» в браузере
+window.addEventListener("popstate", () => {
+  if (document.getElementById("panel").classList.contains("open")) {
+    closeProduct(true);
+  }
+  closeAll(true);
+});
 
 /* ── cart ── */
 function renderCart() {
@@ -109,13 +128,19 @@ const openCart = () => {
   document.getElementById("cart").classList.add("open");
   document.getElementById("scrim").classList.add("open");
   document.body.style.overflow = "hidden";
+  if (!history.state?.drawer) history.pushState({ drawer: "cart" }, "");
 };
-const closeAll = () => {
+
+const closeAll = (fromHistory = false) => {
+  const wasOpen =
+    document.getElementById("cart").classList.contains("open") ||
+    document.getElementById("menu").classList.contains("open");
   document.getElementById("cart").classList.remove("open");
   document.getElementById("menu").classList.remove("open");
   document.getElementById("scrim").classList.remove("open");
   if (!document.getElementById("panel").classList.contains("open"))
     document.body.style.overflow = "";
+  if (wasOpen && !fromHistory && history.state?.drawer) history.back();
 };
 
 /* ── checkout ── */
@@ -209,6 +234,7 @@ document.getElementById("menuOpen").addEventListener("click", () => {
   document.getElementById("menu").classList.add("open");
   document.getElementById("scrim").classList.add("open");
   document.body.style.overflow = "hidden";
+  if (!history.state?.drawer) history.pushState({ drawer: "menu" }, "");
 });
 document.getElementById("menuClose").addEventListener("click", closeAll);
 
