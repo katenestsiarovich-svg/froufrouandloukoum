@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Админка · froufrou and loukoum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--bone:#F7F5F1;--paper:#fff;--ink:#1C1A19;--ash:#8B8681;--hair:#DEDAD4;--clay:#8E4A3C;--ok:#3F6B4A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bone);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;-webkit-font-smoothing:antialiased}
+.caps{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;font-weight:400}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-weight:300;font-size:.9rem;width:100%;
+  padding:12px;border:1px solid var(--hair);background:var(--paper);color:var(--ink);border-radius:0}
+input:focus,textarea,select:focus{outline:2px solid var(--clay);outline-offset:1px}
+textarea{min-height:76px;resize:vertical}
+label{display:block;margin-bottom:18px}
+label .caps{color:var(--ash);margin-bottom:7px;display:block}
+
+header{border-bottom:1px solid var(--hair);padding:20px 18px;display:flex;
+  justify-content:space-between;align-items:center;background:var(--bone);
+  position:sticky;top:0;z-index:10}
+header h1{font-family:'Cormorant',serif;font-weight:300;font-size:1.2rem;letter-spacing:.16em}
+.wrap{max-width:660px;margin:0 auto;padding:24px 18px 80px}
+
+/* вход */
+#login{max-width:340px;margin:16vh auto;padding:0 18px;text-align:center}
+#login h1{font-family:'Cormorant',serif;font-weight:300;font-size:1.5rem;
+  letter-spacing:.16em;margin-bottom:8px}
+#login p{color:var(--ash);font-size:.82rem;margin-bottom:26px}
+
+.btn{background:var(--ink);color:var(--bone);padding:15px;width:100%;
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn:disabled{background:var(--hair);color:var(--ash);cursor:not-allowed}
+.btn-ghost{border:1px solid var(--hair);background:none;color:var(--ink);padding:11px 16px;
+  font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;width:auto}
+.btn-ghost:hover{border-color:var(--ink)}
+.btn-del{color:var(--clay);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;
+  border-bottom:1px solid transparent}
+.btn-del:hover{border-color:var(--clay)}
+
+.msg{padding:12px 14px;font-size:.8rem;margin-bottom:18px;line-height:1.6;display:none}
+.msg.on{display:block}
+.msg.err{background:#F6EAE7;color:var(--clay)}
+.msg.ok{background:#E9F0EA;color:var(--ok)}
+
+.card{background:var(--paper);border:1px solid var(--hair);padding:20px;margin-bottom:14px}
+.card-top{display:flex;gap:14px;align-items:flex-start}
+.thumb{width:62px;height:82px;background:var(--bone);flex:none;border:1px solid var(--hair)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.card h3{font-size:.82rem;font-weight:400;line-height:1.5;margin-bottom:5px}
+.meta{font-size:.72rem;color:var(--ash);line-height:1.7}
+.tag{display:inline-block;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 7px;border:1px solid var(--hair);margin-top:7px;color:var(--ash)}
+.tag.live{color:var(--ok);border-color:var(--ok)}
+.tag.hid{color:var(--clay);border-color:var(--clay)}
+.card-acts{display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--hair);
+  align-items:center;flex-wrap:wrap}
+
+.shots{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.shot{position:relative;width:64px;height:84px;border:1px solid var(--hair)}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot button{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;
+  background:var(--ink);color:#fff;font-size:.7rem;line-height:1;display:flex;
+  align-items:center;justify-content:center}
+.cover{position:absolute;bottom:0;left:0;right:0;background:rgba(28,26,25,.82);color:#fff;
+  font-size:.5rem;letter-spacing:.1em;text-align:center;padding:2px}
+
+details{border:1px solid var(--hair);background:var(--paper);margin-bottom:24px}
+summary{padding:16px 20px;cursor:pointer;list-style:none;font-size:.7rem;
+  letter-spacing:.2em;text-transform:uppercase}
+summary::-webkit-details-marker{display:none}
+details[open] summary{border-bottom:1px solid var(--hair)}
+.details-body{padding:20px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:.68rem;color:var(--ash);line-height:1.7;margin:-10px 0 18px}
+.empty{text-align:center;color:var(--ash);font-size:.82rem;padding:50px 0;line-height:1.8}
+.chk{display:flex;align-items:center;gap:9px;margin-bottom:18px}
+.chk input{width:auto}
+.chk span{font-size:.8rem}
+:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- вход -->
+<div id="login">
+  <h1>админка</h1>
+  <p>froufrou and loukoum</p>
+  <div class="msg err" id="loginErr"></div>
+  <label>
+    <input type="password" id="pw" placeholder="Пароль" autocomplete="current-password">
+  </label>
+  <button class="btn" id="loginBtn">Войти</button>
+</div>
+
+<!-- панель -->
+<div id="panel" style="display:none">
+  <header>
+    <h1>админка</h1>
+    <button class="btn-ghost" id="out">Выйти</button>
+  </header>
+
+  <div class="wrap">
+    <div class="msg" id="msg"></div>
+
+    <details id="addBox">
+      <summary>+ Добавить вещь</summary>
+      <div class="details-body">
+        <label><span class="caps">Название</span>
+          <input id="f_name" placeholder="Ruffle Tie Jacket in Flax Linen"></label>
+
+        <div class="row">
+          <label><span class="caps">Категория</span>
+            <select id="f_cat">
+              <option value="dresses">Dresses</option>
+              <option value="jackets">Jackets</option>
+            </select></label>
+          <label><span class="caps">Цена, €</span>
+            <input id="f_price" type="number" inputmode="numeric" placeholder="1180"></label>
+        </div>
+
+        <label><span class="caps">Размеры</span>
+          <input id="f_sizes" value="XS,S,M,L,XL"></label>
+        <div class="hint">Через запятую, без пробелов</div>
+
+        <label><span class="caps">Описание</span>
+          <textarea id="f_desc" placeholder="A stand-collar jacket closed with hand-tied linen ribbons."></textarea></label>
+        <label><span class="caps">Состав</span>
+          <textarea id="f_comp" placeholder="100% washed linen."></textarea></label>
+        <label><span class="caps">Посадка</span>
+          <textarea id="f_fit" placeholder="Cut generous through the body. Model is 174 cm, wearing S."></textarea></label>
+
+        <div class="chk">
+          <input type="checkbox" id="f_stripe" checked>
+          <span>Создать ссылку на оплату в Stripe</span>
+        </div>
+        <div class="hint">Товар и цена заведутся в Stripe сами. Если ключ Stripe не настроен — сними галочку, заказ будет приходить письмом.</div>
+
+        <div class="chk">
+          <input type="checkbox" id="f_pub" checked>
+          <span>Показывать на сайте</span>
+        </div>
+
+        <button class="btn" id="add">Добавить</button>
+      </div>
+    </details>
+
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let items = [];
+
+const say = (text, kind = "ok") => {
+  const m = $("msg");
+  m.textContent = text;
+  m.className = "msg on " + kind;
+  if (kind === "ok") setTimeout(() => m.className = "msg", 3500);
+};
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && !path.includes("login")) { location.reload(); return; }
+  if (!res.ok) throw new Error(data.error || "Ошибка");
+  return data;
+}
+
+// ── вход ──
+$("loginBtn").onclick = async () => {
+  const err = $("loginErr");
+  err.className = "msg err";
+  try {
+    await api("/api/admin/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ password: $("pw").value })
+    });
+    show();
+  } catch (e) {
+    err.textContent = e.message;
+    err.className = "msg err on";
+  }
+};
+$("pw").onkeydown = e => { if (e.key === "Enter") $("loginBtn").click(); };
+
+$("out").onclick = async () => { await fetch("/api/admin/logout"); location.reload(); };
+
+// ── список ──
+async function load() {
+  items = await api("/api/admin/products");
+  const box = $("list");
+
+  if (!items.length) {
+    box.innerHTML = `<div class="empty">Пока ничего нет.<br>Добавь первую вещь выше.</div>`;
+    return;
+  }
+
+  box.innerHTML = items.map(p => `
+    <div class="card">
+      <div class="card-top">
+        <div class="thumb">${p.images[0] ? `<img src="${p.images[0]}" alt="">` : ""}</div>
+        <div>
+          <h3>${esc(p.name)}</h3>
+          <div class="meta">€${p.price} · ${p.category}<br>${p.sizes.join(" · ")}</div>
+          <span class="tag ${p.published ? "live" : "hid"}">${p.published ? "На сайте" : "Скрыта"}</span>
+          ${p.stripe ? `<span class="tag">Stripe</span>` : ""}
+        </div>
+      </div>
+
+      <div class="shots">
+        ${p.images.map((src, i) => `
+          <div class="shot">
+            <img src="${src}" alt="">
+            <button data-del-img="${src}" title="Удалить">×</button>
+            ${i === 0 ? `<div class="cover">обложка</div>` : ""}
+          </div>`).join("")}
+      </div>
+
+      <label style="margin:0">
+        <span class="caps">Добавить фото</span>
+        <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-up="${p.id}">
+      </label>
+      <div class="hint">Вертикальные, 3:4. До 6 MB.</div>
+
+      <div class="card-acts">
+        <button class="btn-ghost" data-toggle="${p.id}">${p.published ? "Скрыть" : "Показать"}</button>
+        ${p.stripe ? `<a class="btn-ghost" href="${p.stripe}" target="_blank" rel="noopener" style="text-decoration:none">Ссылка оплаты</a>` : ""}
+        <button class="btn-del" data-del="${p.id}">Удалить</button>
+      </div>
+    </div>`).join("");
+}
+
+const esc = s => String(s).replace(/[&<>"]/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ── добавить ──
+$("add").onclick = async () => {
+  const btn = $("add");
+  if (!$("f_name").value.trim() || !$("f_price").value) {
+    return say("Нужны название и цена", "err");
+  }
+  btn.disabled = true; btn.textContent = "Добавляю…";
+  try {
+    const r = await api("/api/admin/product", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: $("f_name").value.trim(),
+        category: $("f_cat").value,
+        price: Number($("f_price").value),
+        sizes: $("f_sizes").value,
+        description: $("f_desc").value,
+        composition: $("f_comp").value,
+        sizing: $("f_fit").value,
+        makeStripe: $("f_stripe").checked,
+        published: $("f_pub").checked
+      })
+    });
+    ["f_name","f_price","f_desc","f_comp","f_fit"].forEach(i => $(i).value = "");
+    $("addBox").open = false;
+    say(r.stripe ? "Добавлено. Ссылка Stripe создана." : "Добавлено. Теперь загрузи фото.");
+    await load();
+  } catch (e) { say(e.message, "err"); }
+  btn.disabled = false; btn.textContent = "Добавить";
+};
+
+// ── действия в списке ──
+document.addEventListener("change", async e => {
+  const up = e.target.dataset.up;
+  if (!up) return;
+  const files = [...e.target.files];
+  if (!files.length) return;
+  say(`Загружаю ${files.length}…`);
+  try {
+    for (const f of files) {
+      const fd = new FormData();
+      fd.append("file", f);
+      fd.append("product_id", up);
+      await api("/api/admin/upload", { method: "POST", body: fd });
+    }
+    say("Фото загружены");
+    await load();
+  } catch (err) { say(err.message, "err"); }
+});
+
+document.addEventListener("click", async e => {
+  const t = e.target;
+
+  if (t.dataset.del) {
+    if (!confirm("Удалить вещь и все её фото? Отменить будет нельзя.")) return;
+    try { await api("/api/admin/product/" + t.dataset.del, { method: "DELETE" });
+      say("Удалено"); await load(); } catch (err) { say(err.message, "err"); }
+  }
+
+  if (t.dataset.delImg) {
+    const key = t.dataset.delImg.replace("/img/", "");
+    try { await api("/api/admin/image", {
+        method: "DELETE", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ key }) });
+      await load(); } catch (err) { say(err.message, "err"); }
+  }
+
+  if (t.dataset.toggle) {
+    const p = items.find(i => i.id === t.dataset.toggle);
+    try { await api("/api/admin/product/" + p.id, {
+        method: "PUT", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...p, sizes: p.sizes.join(","), published: !p.published }) });
+      await load(); } catch (err) { say(err.message, "err"); }
+  }
+});
+
+async function show() {
+  $("login").style.display = "none";
+  $("panel").style.display = "block";
+  await load();
+}
+
+// уже вошли?
+fetch("/api/admin/products").then(r => { if (r.ok) show(); });
+</script>
+</body>
+</html>
