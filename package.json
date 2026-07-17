@@ -1,0 +1,5 @@
+{
+  "name": "froufrou-shop",
+  "private": true,
+  "devDependencies": { "wrangler": "^4.112.0" }
+}

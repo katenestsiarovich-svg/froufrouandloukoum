@@ -1,0 +1,17 @@
+{
+  "name": "froufrou-shop",
+  "main": "worker.js",
+  "compatibility_date": "2026-07-01",
+  "assets": {
+    "directory": "./site",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/admin", "/img/*"]
+  },
+  "observability": { "enabled": true },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "froufrou-db" }
+  ],
+  "r2_buckets": [
+    { "binding": "BUCKET" }
+  ]
+}
