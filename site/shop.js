@@ -193,11 +193,17 @@ document.addEventListener("click", e => {
 
   const f = e.target.closest("[data-f]");
   if (f) {
+    // Menu links must navigate to the collection, not merely change a hidden grid.
+    if (f.tagName === "A") e.preventDefault();
     filter = f.dataset.f;
     document.querySelectorAll(".filters button").forEach(b =>
       b.classList.toggle("on", b.dataset.f === filter));
     renderGrid();
-    closeAll();
+    if (f.closest("#menu")) {
+      closeAll(true);
+      history.replaceState(null, "", "#shop");
+      document.getElementById("shop").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
     return;
   }
 
