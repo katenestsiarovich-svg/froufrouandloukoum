@@ -452,9 +452,10 @@ footer .fine{font-size:.68rem;letter-spacing:.05em;line-height:1.9}
 }
 .menu nav a:hover{padding-left:8px}
 
-/* Keep the right-hand model fully in frame on mobile. */
+/* Mobile: show the entire campaign image without cropping either model. */
 @media(max-width:759px){
-  .hero img{object-position:65% 28%}
+  .hero img{display:block;width:100%;height:auto;object-fit:contain;object-position:center}
+  .hero-text{padding-bottom:24px}
 }
 
 /* ── desktop ── */
