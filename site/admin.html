@@ -231,7 +231,9 @@ async function load() {
       </label>
       <div class="hint">Вертикальные, 3:4. До 6 MB.</div>
 
+      <div class="edit-area" id="edit-${p.id}" hidden></div>
       <div class="card-acts">
+        <button class="btn-ghost" data-edit="${p.id}">Редактировать</button>
         <button class="btn-ghost" data-toggle="${p.id}">${p.published ? "Скрыть" : "Показать"}</button>
         ${p.stripe ? `<a class="btn-ghost" href="${p.stripe}" target="_blank" rel="noopener" style="text-decoration:none">Ссылка оплаты</a>` : ""}
         <button class="btn-del" data-del="${p.id}">Удалить</button>
@@ -241,6 +243,62 @@ async function load() {
 
 const esc = s => String(s).replace(/[&<>"]/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ── редактирование всех полей товара ──
+function editForm(p) {
+  const area = document.getElementById("edit-" + p.id);
+  if (!area.hidden) { area.hidden = true; area.innerHTML = ""; return; }
+  document.querySelectorAll(".edit-area").forEach(a => { a.hidden = true; a.innerHTML = ""; });
+  area.hidden = false;
+  area.innerHTML = `
+    <div style="border-top:1px solid var(--hair);margin-top:18px;padding-top:18px">
+      <div class="caps" style="margin-bottom:16px">Редактировать вещь</div>
+      <label><span class="caps">Название</span><input data-field="name" value="${esc(p.name)}"></label>
+      <div class="row">
+        <label><span class="caps">Категория</span><select data-field="category">
+          <option value="dresses" ${p.category === "dresses" ? "selected" : ""}>Dresses</option>
+          <option value="jackets" ${p.category === "jackets" ? "selected" : ""}>Jackets</option>
+        </select></label>
+        <label><span class="caps">Цена, €</span><input type="number" min="0.01" step="0.01" data-field="price" value="${Number(p.price)}"></label>
+      </div>
+      <label><span class="caps">Размеры (через запятую)</span><input data-field="sizes" value="${esc(p.sizes.join(","))}"></label>
+      <label><span class="caps">Описание</span><textarea data-field="description"></textarea></label>
+      <label><span class="caps">Состав</span><textarea data-field="composition"></textarea></label>
+      <label><span class="caps">Посадка</span><textarea data-field="sizing"></textarea></label>
+      <label class="chk"><input type="checkbox" data-field="published" ${p.published ? "checked" : ""}><span>Показывать на сайте</span></label>
+      <div class="hint">Фото добавляются и удаляются выше. Существующая ссылка Stripe сохраняется; изменение цены здесь не меняет цену уже созданной ссылки оплаты.</div>
+      <button class="btn" data-save="${p.id}">Сохранить изменения</button>
+      <button class="btn-ghost" style="margin-top:10px" data-cancel="${p.id}">Отмена</button>
+    </div>`;
+  ["description","composition","sizing"].forEach(k => {
+    area.querySelector(`[data-field="${k}"]`).value = p[k] || "";
+  });
+}
+async function saveEdit(p, button) {
+  const area = document.getElementById("edit-" + p.id);
+  const field = k => area.querySelector(`[data-field="${k}"]`);
+  const price = Number(field("price").value);
+  if (!field("name").value.trim() || !Number.isFinite(price) || price <= 0) {
+    return say("Укажи название и цену больше нуля", "err");
+  }
+  button.disabled = true;
+  try {
+    await api("/api/admin/product/" + encodeURIComponent(p.id), {
+      method:"PUT", headers:{"content-type":"application/json"},
+      body:JSON.stringify({
+        ...p,
+        name:field("name").value.trim(), category:field("category").value,
+        price, sizes:field("sizes").value,
+        description:field("description").value,
+        composition:field("composition").value,
+        sizing:field("sizing").value,
+        published:field("published").checked
+      })
+    });
+    say("Изменения сохранены");
+    await load();
+  } catch (err) { say(err.message, "err"); button.disabled = false; }
+}
 
 // ── добавить ──
 $("add").onclick = async () => {
@@ -294,6 +352,22 @@ document.addEventListener("change", async e => {
 
 document.addEventListener("click", async e => {
   const t = e.target;
+
+  if (t.dataset.edit) {
+    const p = items.find(i => i.id === t.dataset.edit);
+    if (p) editForm(p);
+    return;
+  }
+  if (t.dataset.cancel) {
+    const area = document.getElementById("edit-" + t.dataset.cancel);
+    area.hidden = true; area.innerHTML = "";
+    return;
+  }
+  if (t.dataset.save) {
+    const p = items.find(i => i.id === t.dataset.save);
+    if (p) await saveEdit(p, t);
+    return;
+  }
 
   if (t.dataset.del) {
     if (!confirm("Удалить вещь и все её фото? Отменить будет нельзя.")) return;
